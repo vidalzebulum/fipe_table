@@ -1,16 +1,16 @@
 hora leitura;mês consulta;código FIPE;marca;modelo obtido;preço;modelo desejado;observação
-Thu Jul  4 19:23:14 2024;julho de 2024;864056-4;BRP;can-am Commander MAX DPS 1000R;R$ 159.292,00;can-am Commander MAX DPS 1000R;--
-Thu Jul  4 19:23:25 2024;julho de 2024;864055-6;BRP;can-am Defender 650 DPS HD7 4x4 (UTV);R$ 112.372,00;can-am Defender 650 DPS HD7 4x4 (UTV);--
-Thu Jul  4 19:23:37 2024;julho de 2024;864054-8;BRP;can-am Defender 650 MAX HD7 4x4 (UTV);R$ 119.772,00;can-am Defender 650 MAX HD7 4x4 (UTV);--
-Thu Jul  4 19:23:49 2024;julho de 2024;864052-1;BRP;can-am Defender 976 MAX DPS 4x4 (UTV);R$ 145.392,00;can-am Defender 976 MAX DPS 4x4 (UTV);--
-Thu Jul  4 19:24:01 2024;julho de 2024;864053-0;BRP;can-am Defender 976 MAX HD9 4x4 (UTV);R$ 129.990,00;can-am Defender 976 MAX HD9 4x4 (UTV);--
-Thu Jul  4 19:24:12 2024;julho de 2024;864005-0;BRP;can-am DS 250 EFI 4X2 Quadr.;R$ 42.678,00;can-am DS 250 EFI 4X2 Quadr.;--
-Thu Jul  4 19:24:24 2024;julho de 2024;864036-0;BRP;can-am DS 90 4X2 Quadriciclo;R$ 20.661,00;can-am DS 90 4X2 Quadriciclo;--
-Thu Jul  4 19:24:36 2024;julho de 2024;864045-9;BRP;can-am Maver. X3 MAX XRS TB 900 RR (UTV);R$ 257.994,00;can-am Maver. X3 MAX XRS TB 900 RR (UTV);--
-Thu Jul  4 19:24:49 2024;julho de 2024;864044-0;BRP;can-am Maverick X3 XRC 900 TB RR (UTV);R$ 237.851,00;can-am Maverick X3 XRC 900 TB RR (UTV);--
-Thu Jul  4 19:25:01 2024;julho de 2024;864046-7;BRP;can-am Maverick X3 XRS TB 900 RR (UTV);R$ 237.178,00;can-am Maverick X3 XRS TB 900 RR (UTV);--
-Thu Jul  4 19:25:13 2024;julho de 2024;864051-3;BRP;can-am Oultland. Max LTD 1000R 4x4 Quad.;R$ 121.710,00;can-am Oultland. Max LTD 1000R 4x4 Quad.;--
-Thu Jul  4 19:25:26 2024;julho de 2024;864032-7;BRP;can-am Outlander MAX XT 850 4X4 Quadr.;R$ 101.574,00;can-am Outlander MAX XT 850 4X4 Quadr.;--
-Thu Jul  4 19:25:38 2024;julho de 2024;864038-6;BRP;can-am Outlander MAX 570 4X4 Quadriciclo;R$ 70.072,00;can-am Outlander MAX 570 4X4 Quadriciclo;--
-Thu Jul  4 19:25:50 2024;julho de 2024;864057-2;BRP;can-am Outlander MAX XT 700 4X4 Quadr.;R$ 88.790,00;can-am Outlander MAX XT 700 4X4 Quadr.;--
-Thu Jul  4 19:26:01 2024;julho de 2024;864014-9;BRP;can-am Outlander X MR 1000/1000R 4X4;R$ 116.772,00;can-am Outlander X MR 1000/1000R 4X4;--
+Fri Jul  5 05:35:41 2024;julho de 2024;864056-4;BRP;can-am Commander MAX DPS 1000R;R$ 159.292,00;can-am Commander MAX DPS 1000R;--
+Fri Jul  5 05:35:53 2024;julho de 2024;864055-6;BRP;can-am Defender 650 DPS HD7 4x4 (UTV);R$ 112.372,00;can-am Defender 650 DPS HD7 4x4 (UTV);--
+Fri Jul  5 05:36:04 2024;julho de 2024;864054-8;BRP;can-am Defender 650 MAX HD7 4x4 (UTV);R$ 119.772,00;can-am Defender 650 MAX HD7 4x4 (UTV);--
+Fri Jul  5 05:36:15 2024;julho de 2024;864052-1;BRP;can-am Defender 976 MAX DPS 4x4 (UTV);R$ 145.392,00;can-am Defender 976 MAX DPS 4x4 (UTV);--
+Fri Jul  5 05:36:26 2024;julho de 2024;864053-0;BRP;can-am Defender 976 MAX HD9 4x4 (UTV);R$ 129.990,00;can-am Defender 976 MAX HD9 4x4 (UTV);--
+Fri Jul  5 05:36:38 2024;julho de 2024;864005-0;BRP;can-am DS 250 EFI 4X2 Quadr.;R$ 42.678,00;can-am DS 250 EFI 4X2 Quadr.;--
+Fri Jul  5 05:36:49 2024;julho de 2024;864036-0;BRP;can-am DS 90 4X2 Quadriciclo;R$ 20.661,00;can-am DS 90 4X2 Quadriciclo;--
+Fri Jul  5 05:37:01 2024;julho de 2024;864045-9;BRP;can-am Maver. X3 MAX XRS TB 900 RR (UTV);R$ 257.994,00;can-am Maver. X3 MAX XRS TB 900 RR (UTV);--
+Fri Jul  5 05:37:15 2024;julho de 2024;864044-0;BRP;can-am Maverick X3 XRC 900 TB RR (UTV);R$ 237.851,00;can-am Maverick X3 XRC 900 TB RR (UTV);--
+Fri Jul  5 05:37:26 2024;julho de 2024;864046-7;BRP;can-am Maverick X3 XRS TB 900 RR (UTV);R$ 237.178,00;can-am Maverick X3 XRS TB 900 RR (UTV);--
+Fri Jul  5 05:37:37 2024;julho de 2024;864051-3;BRP;can-am Oultland. Max LTD 1000R 4x4 Quad.;R$ 121.710,00;can-am Oultland. Max LTD 1000R 4x4 Quad.;--
+Fri Jul  5 05:37:50 2024;julho de 2024;864032-7;BRP;can-am Outlander MAX XT 850 4X4 Quadr.;R$ 101.574,00;can-am Outlander MAX XT 850 4X4 Quadr.;--
+Fri Jul  5 05:38:01 2024;julho de 2024;864038-6;BRP;can-am Outlander MAX 570 4X4 Quadriciclo;R$ 70.072,00;can-am Outlander MAX 570 4X4 Quadriciclo;--
+Fri Jul  5 05:38:12 2024;julho de 2024;864057-2;BRP;can-am Outlander MAX XT 700 4X4 Quadr.;R$ 88.790,00;can-am Outlander MAX XT 700 4X4 Quadr.;--
+Fri Jul  5 05:38:23 2024;julho de 2024;864014-9;BRP;can-am Outlander X MR 1000/1000R 4X4;R$ 116.772,00;can-am Outlander X MR 1000/1000R 4X4;--

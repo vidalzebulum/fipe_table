@@ -23,7 +23,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 
 from vsz_log import exception_to_string #logger,log_formatter
-from vsz_funcoes_diversas import  menu 
+#from vsz_funcoes_diversas import  menu 
 
 #Constants
 MODULE_NAME = 'tabelafipe'
@@ -53,104 +53,66 @@ def try_x_times(func,error_message="",repeat=ATTEMPTS):
         if _== repeat-1: raise RuntimeError( f'{error_message}\n{original_error}')  
 
 
-def testes():
-    with browser_connection() as browser: 
-        browser.implicitly_wait(10)
-        #load website
-        command = lambda: browser.get ('https://veiculos.fipe.org.br')
-        try: 
-            try_x_times(func=command,error_message='Erro ao carregar website',repeat=1)
-            browser.maximize_window()
-        except Exception as err:
-            print(err)
-            return
-
-        # acivate motorcycle panel
-        command = lambda: browser.find_element(By.LINK_TEXT,"Consulta de Motos").click()
-        try: try_x_times(func=command,error_message='Erro ao clicar em consulta de motos')
-        except Exception as err:
-            print(err.args[0])
-            return
-        command = lambda: browser.find_element(By.LINK_TEXT,"Pesquisa comum").click()
-        try: try_x_times(func=command,error_message='Erro ao clicar em pesquisa comum')
-        except Exception as err:
-            print(err.args[0])
-            return
-        try:
-    # finding brands, year and models fields
-            xpath='//div[@class="chosen-container chosen-container-single" and @id="selectMarcamoto_chosen"]'
-            brand_element = browser.find_element(By.XPATH,xpath)
-            xpath='//div[@class="chosen-container chosen-container-single" and @id="selectAnomoto_chosen"]'
-            year_element = browser.find_element(By.XPATH,xpath)
-            xpath='//div[@class="chosen-container chosen-container-single" and @id="selectAnoModelomoto_chosen"]'
-            model_element = browser.find_element(By.XPATH,xpath)
-            brand_element.click()
-            web_element=browser.switch_to.active_element
-            web_element.send_keys('brp')
-            web_element.send_keys(Keys.ENTER)
-            year_element.click()
-            web_element=browser.switch_to.active_element
-            web_element.send_keys('zero km')
-            web_element.send_keys(Keys.ENTER)
-            model_element.click()
-            web_element=browser.switch_to.active_element
-            xpath='//li[@class="active-result"]'
-            for model in browser.find_elements(By.XPATH,xpath): print(model.text,len(model.text))
-
-            web_element.send_keys(Keys.ENTER)
-            print(web_element.text)
-            print(model_element.text, 'a')
-            previous_text = ''
-            while previous_text != model_element.text:
-                print((previous_text := model_element.text)) 
-                web_element.send_keys(Keys.ARROW_DOWN)
-                web_element.send_keys(Keys.ARROW_DOWN)
-                web_element.send_keys(Keys.ENTER)
-
-
-        except Exception as err: print(err)
-
-
 def leitura_fipe():
 
     def click_reset_button():
         xpath='//div[@class="button pesquisa clear" and @id="buttonLimparPesquisarmoto"]'
         browser.find_element(By.XPATH,xpath).click()
     
-    with browser_connection() as browser: 
-        browser.implicitly_wait(5)
+    def check_modal():
+        try:
+            xpath='//div[@class="modal alert"]/div[@class="btnClose"]'
+            modal_element = browser.find_element(By.XPATH,xpath)
+            modal_element.click()
+        except: pass
+       
+    def check_cloudfare(): 
+        try:
+            while browser.find_element(By.XPATH,'//h2[@class="h2"]').text.find('Confirme que você é humano') != -1:
+                browser.find_element(By.XPATH,'//input[@type="checkbox"]').click()
+                time.sleep(WAIT_TIME*6)
+        except: pass
 
-        #load website - loadinf motorcycle panel ensures the site was properly loaded. If it fails, the user is asked to respond the human proof
-        for _ in range(ATTEMPTS):
-            if _ == ATTEMPTS -1 :  input('Não foi possível carregar website com sucesso.\nCarregue-o manualmente e tecle enter.')
-            else:
-                command = lambda: browser.get ('https://veiculos.fipe.org.br')
-                time.sleep(WAIT_TIME*4)
-                try: 
-                    try_x_times(func=command,error_message='Erro ao carregar website',repeat=1)
-                except Exception as err:
-                    print('carga site', exception_to_string(err))
-                    if _ == ATTEMPTS-1: return
-                    else: 
-                        time.sleep(WAIT_TIME)
-                        continue
-            # acivate motorcycle panel
-            command = lambda: browser.find_element(By.LINK_TEXT,"Consulta de Motos").click()
-            try: try_x_times(func=command,error_message='Erro ao clicar em consulta de motos',repeat = 1)
-            except Exception as err:
-                    print('consulta', exception_to_string(err)) #  err, err.args[0:(len(err.args)-1) if len(err.args)>0 else err]
-                    if _ == ATTEMPTS-1: return
-                    else: 
-                        time.sleep(WAIT_TIME)
-                        continue
+    def load_website():
+        # attempt to load website without having to ask userto respond the human proof
+        command = lambda: browser.get ('https://veiculos.fipe.org.br')
+        for _ in range(3):
+            try: try_x_times(func=command,error_message='Erro ao carregar website',repeat=1)
+            except Exception as err: print(exception_to_string(err))
+            check_modal()
+            check_cloudfare()
         
-        browser.maximize_window()
-        # selecting proper query
+        # acivate motorcycle panel
+        command = lambda: browser.find_element(By.LINK_TEXT,"Consulta de Motos").click()
+        try: try_x_times(func=command,error_message='Erro ao clicar em consulta de motos')
+        except Exception as err:
+            print(exception_to_string(err))
+            
+        try:
+            xpath='//div[@class="chosen-container chosen-container-single" and @id="selectTabelaReferenciamoto_chosen"]'
+            data_month = browser.find_element(By.XPATH,xpath).text
+            print(data_month)
+        except: pass
+        
+        input('Cheque se website foi carregado com sucesso e tecle enter.')
+        # acivate motorcycle panel
+        command = lambda: browser.find_element(By.LINK_TEXT,"Consulta de Motos").click()
+        try: try_x_times(func=command,error_message='Erro ao clicar em consulta de motos')
+        except Exception as err:
+            print(exception_to_string(err))
+            return
         command = lambda: browser.find_element(By.LINK_TEXT,"Pesquisa comum").click()
         try: try_x_times(func=command,error_message='Erro ao clicar em pesquisa comum')
         except Exception as err:
-            print(err.args[0])
+            print(exception_to_string(err))
             return
+
+        
+    with browser_connection() as browser: 
+        browser.implicitly_wait(5)
+        browser.maximize_window()
+        load_website()
+
         # finding brands, year and models fields
         try:
             xpath='//div[@class="chosen-container chosen-container-single" and @id="selectMarcamoto_chosen"]'
@@ -175,10 +137,12 @@ def leitura_fipe():
         except Exception as err:
             print(err.args[0])
             return
-        brands = ['brp']
         failures_on_process=[] #list of tuples indicating failures on (brand,) or (brand,model)
         with open('leitura_fipe.txt','w') as result_file:
+            result_file.writelines(';'.join(['hora leitura','mês consulta','código FIPE','marca',\
+                                             'modelo obtido','preço','modelo desejado','observação'])+'\n')
             for brand in brands:
+                check_modal()
                 # check if brand has Zero KM models
                 try: 
                     command = lambda: brand_element.click()
@@ -207,13 +171,13 @@ def leitura_fipe():
                     xpath='//div[@id="selectAnoModelomoto_chosen"]/div[@class="chosen-drop"]/ul[@class="chosen-results"]/li'
                     for model in model_element.find_elements(By.XPATH,xpath): 
                         models.append((model.text,model.get_attribute('data-option-array-index')))
-                    for (index,model) in enumerate(models,1): print(index,model)
                 except Exception as err:
                     failures_on_process.append((brand,'-',err.args[0]))
                     continue
 
                 # looping models to retrieve desired info REVISANDO ESTA PARTE
                 for model, array_index in models:
+                    check_modal()
                     try:
                         # filling in brand
                         command = lambda: brand_element.click()
@@ -240,12 +204,12 @@ def leitura_fipe():
                         if model_element.text.find('Nada encontrado com') != -1: 
                             try:
                                 for _ in range(len(model)): web_element.send_keys(Keys.BACKSPACE)
-                                for _ in range(int(array_index)): web_element.send_keys(Keys.ARROW_DOWN)
+                                for _ in range(int(array_index)-1): web_element.send_keys(Keys.ARROW_DOWN)
+                                web_element.send_keys(Keys.RETURN)
                             except Exception as err: 
                                 err.args += ('Modelo não encontrado',)
                                 raise RuntimeError(exception_to_string(err) ) from None
-                            #Falhas [('brp', 'can-am Defender 650 MAX HD7 4x4 (UTV)', 'Problema nos dados da motocicleta'), ('brp', 'can-am Defender 976 MAX DPS 4x4 (UTV)', "'>' not supported between instances of 'tuple' and 'int'"), ('brp', 'can-am Defender 976 MAX HD9 4x4 (UTV)', "'>' not supported between instances of 'tuple' and 'int'"), ('brp', 'can-am DS 250 EFI 4X2 Quadr.', "'>' not supported between instances of 'tuple' and 'int'"), ('brp', 'can-am DS 90 4X2 Quadriciclo', "'>' not supported between instances of 'tuple' and 'int'"), ('brp', 'can-am Maver. X3 MAX XRS TB 900 RR (UTV)', "'>' not supported between instances of 'tuple' and 'int'"), ('brp', 'can-am Maverick X3 XRC 900 TB RR (UTV)', 'Modelo não encontrado.'), ('brp', 'can-am Outlander MAX XT 850 4X4 Quadr.', 'Modelo não encontrado.')]
-                        web_element.send_keys(Keys.ENTER)
+                        else: web_element.send_keys(Keys.ENTER)
                         time.sleep(WAIT_TIME)
                         # reading results
                         command = lambda: browser.find_element(By.ID,"buttonPesquisarmoto").click()
@@ -260,7 +224,9 @@ def leitura_fipe():
                         if len(motorcycle_data) < 17: 
                             print(motorcycle_data)
                             raise RuntimeError('Problema nos dados da motocicleta')
-                        result_file.writelines(datetime.datetime.now().strftime("%c")+";" +";".join([motorcycle_data[3]]+motorcycle_data[5:11:2]+[motorcycle_data[17]])+'\n')
+                        obs = '--' if model == motorcycle_data[9] else 'modelo obtido diferente do modelo desejado'
+                        result_file.writelines(datetime.datetime.now().strftime("%c")+";" +";".join([motorcycle_data[3]]+motorcycle_data[5:11:2]+\
+                                                                                                    [motorcycle_data[17],model,obs])+'\n')
                         # reset search
                         try_x_times(func=click_reset_button,error_message=f'Erro ao clicar no botão Limpar Pesquisa.')
                         time.sleep(WAIT_TIME)
@@ -271,20 +237,9 @@ def leitura_fipe():
 
 
 
-
-
-
-
-
-
-
 #Programa Principal
-
-# begin: threading commands
-#thread_local = threading.local()
-
-# end: threading commands
-
+leitura_fipe()
+""" 
 while True:
     temp = menu('Leitura Tabela FIPE Motos Zero KM',['Testes','Leitura Tabela', '',''],1) 
     if temp == 1: testes()
@@ -292,7 +247,7 @@ while True:
     elif temp ==3: pass
     elif temp ==4: pass
     else: break
-
+ """
 
 
 
