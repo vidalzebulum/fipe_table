@@ -21,9 +21,10 @@ from selenium.webdriver.common.by import By
 #from selenium.webdriver.support import expected_conditions as EC
 #from selenium.webdriver.common.action_chains import ActionChains 
 from selenium.webdriver.support.select import Select
+from threading import Thread, Lock, Event
 
 from vsz_log import exception_to_string #logger,log_formatter
-#from vsz_funcoes_diversas import  menu 
+from vsz_funcoes_diversas import  menu 
 
 #Constants
 MODULE_NAME = 'tabelafipe'
@@ -52,6 +53,66 @@ def try_x_times(func,error_message="",repeat=ATTEMPTS):
             if _== repeat-1: original_error= (err.args[0] if len(err.args>0) else '')
         if _== repeat-1: raise RuntimeError( f'{error_message}\n{original_error}')  
 
+def check_modal(browser,terminate: Event, browser_lock:Lock):
+    # This function deals with modal element insede FIPE website. It is meant to be called as a daemon thread.
+    while not terminate.is_set():
+        try:
+            xpath='//div[@class="modal alert"]/div[@class="btnClose"]'
+            with browser_lock: browser.find_element(By.XPATH,xpath).click()
+        except: pass
+        time.sleep(WAIT_TIME)
+    print(f'{__name__} is done!')
+    
+def check_cloudfare(browser,terminate: Event, browser_lock:Lock): 
+    # This function deals with Cloudfare. It is meant to be called as a daemon thread
+    while not terminate.is_set():
+        try:
+            with browser_lock:
+                if browser.find_element(By.XPATH,'//h2[@class="h2"]').text.find('Confirme que você é humano') != -1:
+                    web_element=browser.switch_to.active_element
+                    web_element.send_keys(Keys.TAB)
+                    web_element=browser.switch_to.active_element
+                    web_element.click() 
+        except:pass
+        time.sleep(WAIT_TIME)
+
+
+def load_website(browser):
+    # attempt to load website without having to ask userto respond the human proof
+    
+    command = lambda: browser.get ('https://veiculos.fipe.org.br')
+    try: try_x_times(func=command,error_message='Erro ao carregar website',repeat=1)
+    except Exception as err: print(exception_to_string(err))
+    #check_modal(browser)
+    #check_cloudfare(browser)
+    return
+
+def check_website(browser):
+    # acivate motorcycle panel
+    command = lambda: browser.find_element(By.LINK_TEXT,"Consulta de Motos").click()
+    try: try_x_times(func=command,error_message='Erro ao clicar em consulta de motos')
+    except Exception as err:
+        print(exception_to_string(err))
+        
+    try:
+        xpath='//div[@class="chosen-container chosen-container-single" and @id="selectTabelaReferenciamoto_chosen"]'
+        data_month = browser.find_element(By.XPATH,xpath).text
+        print(data_month)
+    except: pass
+    return
+    input('Cheque se website foi carregado com sucesso e tecle enter.')
+    # acivate motorcycle panel
+    command = lambda: browser.find_element(By.LINK_TEXT,"Consulta de Motos").click()
+    try: try_x_times(func=command,error_message='Erro ao clicar em consulta de motos')
+    except Exception as err:
+        print(exception_to_string(err))
+        return
+    command = lambda: browser.find_element(By.LINK_TEXT,"Pesquisa comum").click()
+    try: try_x_times(func=command,error_message='Erro ao clicar em pesquisa comum')
+    except Exception as err:
+        print(exception_to_string(err))
+        return
+
 
 def leitura_fipe():
 
@@ -59,59 +120,11 @@ def leitura_fipe():
         xpath='//div[@class="button pesquisa clear" and @id="buttonLimparPesquisarmoto"]'
         browser.find_element(By.XPATH,xpath).click()
     
-    def check_modal():
-        try:
-            xpath='//div[@class="modal alert"]/div[@class="btnClose"]'
-            modal_element = browser.find_element(By.XPATH,xpath)
-            modal_element.click()
-        except: pass
-       
-    def check_cloudfare(): 
-        try:
-            while browser.find_element(By.XPATH,'//h2[@class="h2"]').text.find('Confirme que você é humano') != -1:
-                browser.find_element(By.XPATH,'//input[@type="checkbox"]').click()
-                time.sleep(WAIT_TIME*6)
-        except: pass
-
-    def load_website():
-        # attempt to load website without having to ask userto respond the human proof
-        command = lambda: browser.get ('https://veiculos.fipe.org.br')
-        for _ in range(3):
-            try: try_x_times(func=command,error_message='Erro ao carregar website',repeat=1)
-            except Exception as err: print(exception_to_string(err))
-            check_modal()
-            check_cloudfare()
-        
-        # acivate motorcycle panel
-        command = lambda: browser.find_element(By.LINK_TEXT,"Consulta de Motos").click()
-        try: try_x_times(func=command,error_message='Erro ao clicar em consulta de motos')
-        except Exception as err:
-            print(exception_to_string(err))
-            
-        try:
-            xpath='//div[@class="chosen-container chosen-container-single" and @id="selectTabelaReferenciamoto_chosen"]'
-            data_month = browser.find_element(By.XPATH,xpath).text
-            print(data_month)
-        except: pass
-        
-        input('Cheque se website foi carregado com sucesso e tecle enter.')
-        # acivate motorcycle panel
-        command = lambda: browser.find_element(By.LINK_TEXT,"Consulta de Motos").click()
-        try: try_x_times(func=command,error_message='Erro ao clicar em consulta de motos')
-        except Exception as err:
-            print(exception_to_string(err))
-            return
-        command = lambda: browser.find_element(By.LINK_TEXT,"Pesquisa comum").click()
-        try: try_x_times(func=command,error_message='Erro ao clicar em pesquisa comum')
-        except Exception as err:
-            print(exception_to_string(err))
-            return
-
         
     with browser_connection() as browser: 
         browser.implicitly_wait(5)
         browser.maximize_window()
-        load_website()
+        load_website(browser)
 
         # finding brands, year and models fields
         try:
@@ -238,16 +251,33 @@ def leitura_fipe():
 
 
 #Programa Principal
-leitura_fipe()
-""" 
 while True:
-    temp = menu('Leitura Tabela FIPE Motos Zero KM',['Testes','Leitura Tabela', '',''],1) 
-    if temp == 1: testes()
-    elif temp ==2: leitura_fipe()
+    temp = menu('Leitura Tabela FIPE Motos Zero KM',['Leitura Tabela','Testes', '',''],1) 
+    if temp == 1: leitura_fipe()
+    elif temp ==2: 
+        with browser_connection() as browser: 
+            browser.implicitly_wait(5)
+            terminate_background = Event() # signal to stop backgroud process
+            browser_lock = Lock()
+            browser.maximize_window()
+            modal_thread = Thread(target=check_modal, name='FipeCheckModal', daemon=True, args=(browser,terminate_background,browser_lock))
+            modal_thread.start()
+            cloudfare_thread = Thread(target=check_cloudfare, name='FipeCloudfare', daemon=True, args=(browser,terminate_background,browser_lock))
+            cloudfare_thread.start()
+            while (temp_1:= menu('testes disponíveis',['load website', 'modal','cloudfare'],1)):
+                if temp_1 == 1: 
+                    with browser_lock: load_website(browser)
+                elif temp_1 == 2: pass
+                elif temp_1 == 3: pass
+            #terminate_background(terminate_modal)
+            terminate_background.set()
+            modal_thread.join()
+            cloudfare_thread.join()
+        
     elif temp ==3: pass
     elif temp ==4: pass
     else: break
- """
+
 
 
 
