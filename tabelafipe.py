@@ -71,7 +71,7 @@ def try_x_times(func,error_message="",repeat=ATTEMPTS):
 
 
 def check_modal(browser,terminate: Event, browser_lock:Lock):
-    # This function deals with modal element insede FIPE website. It is meant to be called as a daemon thread.
+    # This function deals with modal element inside FIPE website. It is meant to be called as a daemon thread.
     count= 0 #usage count
     while not terminate.is_set():
         try:
@@ -291,7 +291,7 @@ def check_website(browser):
         return
 
 
-def leitura_fipe():
+""" def leitura_fipe():
 
     def click_reset_button():
         xpath='//div[@class="button pesquisa clear" and @id="buttonLimparPesquisarmoto"]'
@@ -424,11 +424,11 @@ def leitura_fipe():
                         result_file.writelines(";".join([datetime.datetime.now().strftime("%c"),'--',brand,model,exception_to_string(err) ])+'\n')
                         failures_on_process.append((brand,model,err.args[0]))
     print('Falhas\n',failures_on_process)
-
+ """
 
 
 #Programa Principal
-while True:
+while True: 
     temp = menu('Leitura Tabela FIPE Motos Zero KM',['Leitura Tabela','Testes', '',''],1) 
     if temp == 1: leitura_fipe()
     elif temp ==2: 
