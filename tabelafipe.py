@@ -35,10 +35,7 @@ WAIT_TIME  = 0.5
 ATTEMPTS = 4
 
 
-def month_in_portuguese(dtime:datetime.datetime)->str:
-    pass
-                        
-
+                       
 def save_html(source):
 # Receives source code from Selenium and uses  bs4 to convert
     soup = BeautifulSoup(source, "html.parser")
@@ -123,11 +120,12 @@ def load_website(browser,browser_lock:Lock):
         
         with browser_lock:
             try:
+                input('Selecione o ano desejado na tela FIPE')
                 xpath='//div[@id="selectTabelaReferenciamoto_chosen"]/a[@class="chosen-single"]' #@class="chosen-container chosen-container-single" and 
                 data_month = browser.find_element(By.XPATH,xpath).text
                 print(data_month,"selecionado")
-                if data_month[-4::] == '2024': return
-            except: print(aux1)
+                if int(data_month[-4::]) <= datetime.datetime.now().year: return
+            except: print(f'Erro no ano selecionado: {data_month}')
     raise RuntimeError( f'Website não carregado corretamente')
 
 """ xpath='//div[@id="selectTabelaReferenciamoto_chosen"]'
@@ -275,163 +273,11 @@ def get_data(browser,browser_lock: Lock):
     print('Falhas\n',failures_on_process)
 
 
-def check_website(browser):
-    # acivate motorcycle panel
-    input('Cheque se website foi carregado com sucesso e tecle enter.')
-    # acivate motorcycle panel
-    command = lambda: browser.find_element(By.LINK_TEXT,"Consulta de Motos").click()
-    try: try_x_times(func=command,error_message='Erro ao clicar em consulta de motos')
-    except Exception as err:
-        print(exception_to_string(err))
-        return
-    command = lambda: browser.find_element(By.LINK_TEXT,"Pesquisa comum").click()
-    try: try_x_times(func=command,error_message='Erro ao clicar em pesquisa comum')
-    except Exception as err:
-        print(exception_to_string(err))
-        return
-
-
-""" def leitura_fipe():
-
-    def click_reset_button():
-        xpath='//div[@class="button pesquisa clear" and @id="buttonLimparPesquisarmoto"]'
-        browser.find_element(By.XPATH,xpath).click()
-    
-        
-    with browser_connection() as browser: 
-        browser.implicitly_wait(5)
-        browser.maximize_window()
-        load_website(browser)
-
-        # finding brands, year and models fields
-        try:
-            xpath='//div[@class="chosen-container chosen-container-single" and @id="selectMarcamoto_chosen"]'
-            brand_element = browser.find_element(By.XPATH,xpath)
-            xpath='//div[@class="chosen-container chosen-container-single" and @id="selectAnomoto_chosen"]'
-            year_element = browser.find_element(By.XPATH,xpath)
-            xpath='//div[@class="chosen-container chosen-container-single" and @id="selectAnoModelomoto_chosen"]'
-            model_element = browser.find_element(By.XPATH,xpath)
-        except Exception as err:
-            print('Falha ao tentar localizar elemento html da marca, modelo ou ano')
-            return
-
-        # retrieve list of motorcycle companies        
-        try: 
-            command = lambda: brand_element.click()
-            try_x_times(func=command,error_message='Erro ao clicar na montadora para obter lista de montadoras')
-            #web_element=browser.switch_to.active_element
-            xpath='//div[@class="input" and @config="moto"]'
-            brands=browser.find_element(By.XPATH,xpath).text.splitlines()
-            brands = brands[1::]
-            if len(brands) < 20: raise Exception('Erro: menos de 20 montadoras encontradas')
-        except Exception as err:
-            print(err.args[0])
-            return
-        failures_on_process=[] #list of tuples indicating failures on (brand,) or (brand,model)
-        with open('leitura_fipe.txt','w') as result_file:
-            result_file.writelines(';'.join(['hora leitura','mês consulta','código FIPE','marca',\
-                                             'modelo obtido','preço','modelo desejado','observação'])+'\n')
-            for brand in brands:
-                check_modal()
-                # check if brand has Zero KM models
-                try: 
-                    command = lambda: brand_element.click()
-                    try_x_times(func=command,error_message=f'Erro ao clicar na montadora para obter lista de montadoras: {brand}')
-                    web_element=browser.switch_to.active_element
-                    web_element.send_keys(brand)
-                    web_element.send_keys(Keys.ENTER)
-                    time.sleep(WAIT_TIME)
-                    command = lambda: year_element.click()
-                    try_x_times(func=command,error_message=f'Erro ao clicar no ano do modelo para obter modelos de {brand}')
-                    xpath='//div[@class="input" and @config="moto" and @urlconsulta="ConsultarModelosAtravesDoAno"]'
-                    years=browser.find_element(By.XPATH,xpath).text.splitlines()
-                    if years[1] != 'Zero KM': continue
-                    
-                    # retrieving zero km models
-                    web_element=browser.switch_to.active_element
-                    web_element.send_keys('Zero KM')
-                    web_element.send_keys(Keys.ENTER)
-                    time.sleep(WAIT_TIME)
-                    command = lambda: model_element.click()
-                    try_x_times(func=command,error_message=f'Erro ao obter lista de modelos de {brand}')
-                    xpath='//div[@class="input" and @config="moto" and @urlconsulta="ConsultarAnoModelo"]'
-                    models=browser.find_element(By.XPATH,xpath).text.splitlines()[1:-1:]
-                    # Getting models from another html element
-                    models=[]
-                    xpath='//div[@id="selectAnoModelomoto_chosen"]/div[@class="chosen-drop"]/ul[@class="chosen-results"]/li'
-                    for model in model_element.find_elements(By.XPATH,xpath): 
-                        models.append((model.text,model.get_attribute('data-option-array-index')))
-                except Exception as err:
-                    failures_on_process.append((brand,'-',err.args[0]))
-                    continue
-
-                # looping models to retrieve desired info REVISANDO ESTA PARTE
-                for model, array_index in models:
-                    check_modal()
-                    try:
-                        # filling in brand
-                        command = lambda: brand_element.click()
-                        try_x_times(func=command,error_message=f'Erro ao clicar na montadora {brand} para acionar botão Pesquisar.')
-                        web_element=browser.switch_to.active_element
-                        web_element.send_keys(brand)
-                        web_element.send_keys(Keys.ENTER)
-                        time.sleep(WAIT_TIME)
-                        # filling in 'zero km'
-                        command = lambda: year_element.click()
-                        try_x_times(func=command,error_message=f'Erro ao clicar no ano-modelo ds montadora {brand} antes de acionar botão Pesquisar.')
-                        web_element=browser.switch_to.active_element
-                        web_element.send_keys('Zero KM')
-                        web_element.send_keys(Keys.ENTER)
-                        time.sleep(WAIT_TIME)
-                        # filling in model
-                        command = lambda: model_element.click()
-                        try_x_times(func=command,error_message=f'Erro ao clicar na montadora/modelo {brand}/{model} para acionar botão Pesquisar.')
-                        web_element=browser.switch_to.active_element
-                        web_element.send_keys(model)
-                        # testing if a result was found
-                        # FUTURE: if it fails to find the moto by name, try by htlm li array index but first try the html li  name
-                        # FUTURE: make sure there is only one result
-                        if model_element.text.find('Nada encontrado com') != -1: 
-                            try:
-                                for _ in range(len(model)): web_element.send_keys(Keys.BACKSPACE)
-                                for _ in range(int(array_index)-1): web_element.send_keys(Keys.ARROW_DOWN)
-                                web_element.send_keys(Keys.RETURN)
-                            except Exception as err: 
-                                err.args += ('Modelo não encontrado',)
-                                raise RuntimeError(exception_to_string(err) ) from None
-                        else: web_element.send_keys(Keys.ENTER)
-                        time.sleep(WAIT_TIME)
-                        # reading results
-                        command = lambda: browser.find_element(By.ID,"buttonPesquisarmoto").click()
-                        try_x_times(func=command,error_message=f'Erro ao clicar no botão Pesquisar para na montadora/modelo {brand}/{model}.')
-                        for _ in range(ATTEMPTS):
-                            time.sleep(WAIT_TIME * (_+1))
-                            try: 
-                                motorcycle_data=browser.find_element(By.ID,"resultadoConsultamotoFiltros").text.splitlines()
-                                break
-                            except: 
-                                if _ == ATTEMPTS-1: raise RuntimeError('Dados da pesquisa não encontrados na webpage.') from None
-                        if len(motorcycle_data) < 17: 
-                            print(motorcycle_data)
-                            raise RuntimeError('Problema nos dados da motocicleta')
-                        obs = '--' if model == motorcycle_data[9] else 'modelo obtido diferente do modelo desejado'
-                        result_file.writelines(datetime.datetime.now().strftime("%c")+";" +";".join([motorcycle_data[3]]+motorcycle_data[5:11:2]+\
-                                                                                                    [motorcycle_data[17],model,obs])+'\n')
-                        # reset search
-                        try_x_times(func=click_reset_button,error_message=f'Erro ao clicar no botão Limpar Pesquisa.')
-                        time.sleep(WAIT_TIME)
-                    except Exception as err: 
-                        result_file.writelines(";".join([datetime.datetime.now().strftime("%c"),'--',brand,model,exception_to_string(err) ])+'\n')
-                        failures_on_process.append((brand,model,err.args[0]))
-    print('Falhas\n',failures_on_process)
- """
-
 
 #Programa Principal
 while True: 
     temp = menu('Leitura Tabela FIPE Motos Zero KM',['Leitura Tabela','Testes', '',''],1) 
-    if temp == 1: leitura_fipe()
-    elif temp ==2: 
+    if temp ==1: 
         with browser_connection() as browser: 
             browser.implicitly_wait(2)
             terminate_background = Event() # signal to stop backgroud process
@@ -451,9 +297,7 @@ while True:
             terminate_background.set()
             modal_thread.join()
             cloudfare_thread.join()
-        
-    elif temp ==3: pass
-    elif temp ==4: pass
+    elif temp in(2,3,4) : pass
     else: break
 
 
